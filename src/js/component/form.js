@@ -1,54 +1,76 @@
-import React from "react";
-import { useContext, useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import "../../styles/form.css";
 import { Context } from "../store/appContext";
+import { useParams } from "react-router";
 
-export const Form = () => {
+export const Form = (props) => {
+    const { store, actions } = useContext(Context)
+    const params = useParams()
 
-  const { store, actions } = useContext(Context)
+    const [inputValue, setInputValue] = useState({
+        name: "",
+        phone: "",
+        email: "",
+        address: ""
+    })
 
-  const [inputValue, setInputValue] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    address: ""
-  })
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    actions.createContact(inputValue)
-    setInputValue({
-      name: "",
-      phone: "",
-      email: "",
-      address: ""
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        if (props.pathname == '/add-contact') {
+            actions.postContact(inputValue)
+            setInputValue({
+                name: "",
+                phone: "",
+                email: "",
+                address: ""
+            })
+        } else {
+            actions.editContact(params.id, inputValue)
+            setInputValue({
+                name: "",
+                phone: "",
+                email: "",
+                address: ""
+            })
+        }
     }
+    let contact = store.contactList.find(contact => contact.id == params.id)
+    useEffect(() => {
+        if (props.pathname != '/add-contact') {
+            setInputValue({
+                name: `${contact.name}`,
+                phone: `${contact.phone}`,
+                email: `${contact.email}`,
+                address: `${contact.address}`
+            })
+        }
+    }, [])
+
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setInputValue({ ...inputValue, [name]: value });
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+                <label htmlFor="exampleInputPassword1" className="form-label" >Name</label>
+                <input type="text" className="form-control" required value={inputValue.name} name="name" onChange={handleChange} />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="exampleInputEmail1" className="form-label">Email</label>
+                <input type="email" className="form-control" value={inputValue.email} name="email" onChange={handleChange} />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="exampleInputPassword1" className="form-label">Phone</label>
+                <input type="text" className="form-control" required value={inputValue.phone} name="phone" onChange={handleChange} />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="exampleInputPassword1" className="form-label">Address</label>
+                <input type="text" className="form-control" value={inputValue.address} name="address" onChange={handleChange} />
+            </div>
+            <button type="submit" className="btn btn-primary w-100" >Save</button>
+        </form>
     )
-  }
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setInputValue({ ...inputValue, [name]: value })
-  }
-
-  return (
-    <form className="container" onSubmit={handleSubmit}>
-      <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">Full Name</label>
-        <input required onChange={handleChange} type="text" class="form-control" name="name" />
-      </div>
-      <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">Email address</label>
-        <input onChange={handleChange} type="email" class="form-control" name="email" />
-      </div>
-      <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">Phone</label>
-        <input required onChange={handleChange} type="text" class="form-control" name="phone" />
-      </div>
-      <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">Address</label>
-        <input onChange={handleChange} type="text" class="form-control" name="address" />
-      </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-  )
 }

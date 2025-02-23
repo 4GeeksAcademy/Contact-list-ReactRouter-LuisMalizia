@@ -1,58 +1,57 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			listContact: [],
+			contactList: [],
+			hiddenMessage: "hidden",
+			deleteStatus: false
 		},
 		actions: {
-			createAgenda: async () => {
-				const requestOptions = {
-					method: "POST",
-					redirect: "follow"
-				};
-
-				try {
-					const response = await fetch("https://playground.4geeks.com/contact/agendas/maliziam", requestOptions);
-					const result = await response.json();
-					console.log(result)
-				} catch (error) {
-					console.error(error);
-				}
-			},
-
-			getAllContacts: async () => {
+			getContactList: async () => {
 				const requestOptions = {
 					method: "GET",
 					redirect: "follow"
 				};
 
 				try {
-					const response = await fetch("https://playground.4geeks.com/contact/agendas/maliziam/contacts", requestOptions);
+					const response = await fetch("https://playground.4geeks.com/contact/agendas/PabloQuerales/contacts/", requestOptions);
 					const result = await response.json();
-					setStore({ listContact: result.contacts })
+					setStore({ contactList: result.contacts, hiddenMessage: "hidden", deleteStatus: false })
+
+				} catch (error) {
+					console.error(error);
+				};
+			},
+
+			createUser: async () => {
+				const requestOptions = {
+					method: "POST",
+					redirect: "follow"
+				};
+
+				try {
+					const response = await fetch("https://playground.4geeks.com/contact/agendas/PabloQuerales", requestOptions);
 				} catch (error) {
 					console.error(error);
 				}
 			},
-			createContact: async (inputValue) => {
+
+			postContact: async (inputValue) => {
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
-
 				const raw = JSON.stringify({
 					"name": `${inputValue.name}`,
 					"phone": `${inputValue.phone}`,
 					"email": `${inputValue.email}`,
 					"address": `${inputValue.address}`
 				});
-
 				const requestOptions = {
 					method: "POST",
 					headers: myHeaders,
 					body: raw,
 					redirect: "follow"
 				};
-
 				try {
-					const response = await fetch("https://playground.4geeks.com/contact/agendas/maliziam/contacts", requestOptions);
+					const response = await fetch("https://playground.4geeks.com/contact/agendas/PabloQuerales/contacts", requestOptions);
 					if (response.status == 201) {
 						setStore({ hiddenMessage: "" })
 					} else {
@@ -68,7 +67,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					redirect: "follow"
 				};
 				try {
-					const response = await fetch(`https://playground.4geeks.com/contact/agendas/maliziam/contacts/${id}`, requestOptions)
+					const response = await fetch(`https://playground.4geeks.com/contact/agendas/PabloQuerales/contacts/${id}`, requestOptions)
 					if (response.status == 204) {
 						setStore({deleteStatus: true})
 					}
@@ -77,7 +76,36 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error(error);
 				};
 			},
-		}
+			editContact: async (id, inputValue) => {
+				const myHeaders = new Headers();
+				myHeaders.append("Content-Type", "application/json");
+
+				const raw = JSON.stringify({
+					"name": `${inputValue.name}`,
+					"phone": `${inputValue.phone}`,
+					"email": `${inputValue.email}`,
+					"address": `${inputValue.address}`
+				});
+
+				const requestOptions = {
+					method: "PUT",
+					headers: myHeaders,
+					body: raw,
+					redirect: "follow"
+				};
+
+				try {
+					const response = await fetch(`https://playground.4geeks.com/contact/agendas/PabloQuerales/contacts/${id}`, requestOptions);
+					if (response.status == 200) {
+						setStore({ hiddenMessage: "" })
+					} else {
+						setStore({ hiddenMessage: "hidden" })
+					}
+				} catch (error) {
+					console.error(error);
+				}
+			}
+		},
 	};
 };
 

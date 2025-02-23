@@ -1,7 +1,8 @@
-import React, { useEffect, useContext } from "react";
+import React, { useContext, useEffect } from "react";
+import "../../styles/home.css";
+import { Link } from "react-router-dom";
 import { Card } from "../component/card";
 import { Context } from "../store/appContext";
-import { Link } from "react-router-dom";
 
 
 export const Home = () => {
@@ -9,21 +10,23 @@ export const Home = () => {
 	const { store, actions } = useContext(Context)
 
 	useEffect(() => {
-		actions.createAgenda(),
-			actions.getAllContacts()
-	}, [])
+		actions.createUser()
+		actions.getContactList()
+	}, [store.deleteStatus])
 
 	return (
-		<div className="text-center mt-5" >
-			<Link to="/addContact">
-				<button className="btn btn-primary">Add Contact</button>
-			</Link>
-			{store.listContact.map((data) => {
+		<div className="container">
+			<div className="d-flex flex-row-reverse">
+				<Link to="/add-contact">
+					<button className="btn btn-primary my-2">Add new Contact</button>
+				</Link>
+			</div>
+			{store.contactList.length > 0 ? store.contactList.map((data) => {
 				return (
-					<Card name={data.name} phone={data.phone} email={data.email} address={data.address}/>
+					<Card address={data.address} email={data.email} name={data.name} phone={data.phone} id={data.id} />
 				)
-			})
+			}) : "NO HAY CONTACTOS CREADOS, POR FAVOR AGREGUE UNO"
 			}
 		</div>
-	)
+	);
 }
